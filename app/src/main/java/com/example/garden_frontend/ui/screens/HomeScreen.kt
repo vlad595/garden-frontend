@@ -8,16 +8,22 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.NavHost
+import androidx.navigation.NavHostController
+import com.example.garden_frontend.R
 import com.example.garden_frontend.ui.components.BottomBar
 import com.example.garden_frontend.ui.components.TopBar
+import com.example.garden_frontend.ui.navigation.Screen
 import com.example.garden_frontend.ui.theme.GardenfrontendTheme
 
 @Composable
-fun Main(){
+fun Main(navController: NavHostController){
     Scaffold(
         topBar = {
-            TopBar()
+            TopBar(iconOnClick = {navController.navigate(Screen.Account.route)}, painterResource(R.drawable.account_circle_24px))
         },
 
         bottomBar = {
@@ -43,6 +49,6 @@ fun HomeScreen(modifier: Modifier){
 @Preview(showSystemUi = true)
 fun MainPreview(){
     GardenfrontendTheme() {
-        Main()
+
     }
 }

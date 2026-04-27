@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -25,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.example.garden_frontend.R
 
 @Composable
-fun TopBar(){
+fun TopBar(iconOnClick: () -> Unit, painter: Painter){
     Column(
         modifier = Modifier.fillMaxWidth().background(color = MaterialTheme.colorScheme.primary)
     ) {
@@ -52,10 +53,10 @@ fun TopBar(){
             Spacer(modifier = Modifier.weight(1f))
 
             IconButton(
-                onClick = {/*TODO*/}
+                onClick = iconOnClick
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.account_circle_40px),
+                    painter = painter,
                     contentDescription = "",
                     modifier = Modifier.size(48.dp),
                     tint = MaterialTheme.colorScheme.onPrimary

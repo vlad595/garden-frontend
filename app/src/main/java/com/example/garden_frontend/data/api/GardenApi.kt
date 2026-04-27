@@ -6,6 +6,9 @@ import retrofit2.http.POST
 import com.example.garden_frontend.domain.models.UserReturnResponse
 import com.example.garden_frontend.domain.models.UserLoginRequest
 import com.example.garden_frontend.domain.models.UserRegRequest
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.Headers
 
 interface GardenApi {
     @POST("api/Auth/login")
@@ -13,4 +16,7 @@ interface GardenApi {
 
     @POST("api/Auth/register")
     suspend fun register(@Body request: UserRegRequest): Response<UserReturnResponse>
+
+    @GET("api/Auth/me")
+    suspend fun me(@Header("Authorization") token: String): Response<UserReturnResponse>
 }
