@@ -1,13 +1,10 @@
 package com.example.garden_frontend.ui.screens.auth
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.ui.text.resolveDefaults
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.garden_frontend.data.api.Client
-import com.example.garden_frontend.domain.models.UserLoginRequest
-import com.example.garden_frontend.domain.models.UserRegRequest
+import com.example.garden_frontend.data.api.dto.UserLoginRequest
+import com.example.garden_frontend.data.api.dto.UserRegRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

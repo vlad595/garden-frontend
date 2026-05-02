@@ -1,6 +1,5 @@
 package com.example.garden_frontend.ui.screens.account
 
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,22 +22,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.garden_frontend.R
-import com.example.garden_frontend.domain.models.UserReturnResponse
+import com.example.garden_frontend.data.api.dto.UserReturnResponse
 import com.example.garden_frontend.ui.components.TopBar
 import com.example.garden_frontend.ui.navigation.Screen
 import com.example.garden_frontend.ui.theme.GardenfrontendTheme
 import com.example.garden_frontend.utils.TokenManager
-import java.util.jar.Attributes
 
 @Composable
 fun AccountScreen(tokenManager: TokenManager, navController: NavHostController){

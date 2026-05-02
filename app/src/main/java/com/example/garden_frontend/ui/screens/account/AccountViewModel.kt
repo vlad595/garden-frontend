@@ -1,11 +1,9 @@
 package com.example.garden_frontend.ui.screens.account
 
-import android.accounts.Account
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.garden_frontend.data.api.Client
-import com.example.garden_frontend.domain.models.UserReturnResponse
-import com.example.garden_frontend.ui.screens.auth.AuthState
+import com.example.garden_frontend.data.api.dto.UserReturnResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

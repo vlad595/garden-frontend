@@ -1,6 +1,4 @@
-package com.example.garden_frontend.domain.models
-
-import com.google.gson.annotations.SerializedName
+package com.example.garden_frontend.data.api.dto
 
 data class UserLoginRequest(
     val email: String,
