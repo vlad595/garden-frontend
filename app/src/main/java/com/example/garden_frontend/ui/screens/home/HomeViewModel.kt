@@ -3,7 +3,11 @@ package com.example.garden_frontend.ui.screens.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.garden_frontend.data.api.Client
+import com.example.garden_frontend.data.api.dto.BerryBushCreation
+import com.example.garden_frontend.data.api.dto.FruitTreeCreation
 import com.example.garden_frontend.data.api.dto.PlantModel
+import com.example.garden_frontend.domain.models.BerryBush
+import com.example.garden_frontend.domain.models.FruitTree
 import com.example.garden_frontend.ui.screens.account.AccountState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

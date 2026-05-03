@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import com.example.garden_frontend.ui.screens.home.Main
 import com.example.garden_frontend.ui.screens.account.AccountScreen
 import com.example.garden_frontend.ui.screens.auth.AuthScreen
+import com.example.garden_frontend.ui.screens.plantCreation.PlantCreationScreen
 import com.example.garden_frontend.utils.TokenManager
 
 @Composable
@@ -23,6 +24,9 @@ fun NavSetup(navController: NavHostController, startDestination: String, tokenMa
         }
         composable(route = Screen.Account.route){
             AccountScreen(tokenManager, navController)
+        }
+        composable(route = Screen.PlantCreation.route){
+            PlantCreationScreen(navController = navController, tokenManager = tokenManager)
         }
     }
 }

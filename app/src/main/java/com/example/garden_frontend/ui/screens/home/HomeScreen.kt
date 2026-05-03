@@ -1,5 +1,6 @@
 package com.example.garden_frontend.ui.screens.home
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.layout.Column
@@ -9,9 +10,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
@@ -86,7 +89,7 @@ fun Main(navController: NavHostController, tokenManager: TokenManager){
         ) { page ->
             when (page){
                 0 -> HomeScreen(viewModel = viewModel, tokenManager = tokenManager, innerPadding = innerPadding)
-                1 -> GardenScreen(viewModel = viewModel, tokenManager = tokenManager, innerPadding = innerPadding)
+                1 -> GardenScreen(viewModel = viewModel, tokenManager = tokenManager, innerPadding = innerPadding, navController = navController)
                 2 -> HarvestsScreen(viewModel = viewModel, tokenManager = tokenManager, innerPadding = innerPadding)
                 3 -> CareResourcesScreen(viewModel = viewModel, tokenManager = tokenManager, innerPadding = innerPadding)
             }
@@ -175,7 +178,7 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel, tokenMan
 }
 
 @Composable
-fun GardenScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel, tokenManager: TokenManager, innerPadding: PaddingValues){
+fun GardenScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel, tokenManager: TokenManager, innerPadding: PaddingValues, navController: NavHostController){
     val state by viewModel.state.collectAsState()
     var Plants by remember { mutableStateOf<List<PlantModel>?>(null) }
 
@@ -193,7 +196,7 @@ fun GardenScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel, tokenM
     ) {
         item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(this.maxLineSpan) }) {
             Button(
-                onClick = {},
+                onClick = { navController.navigate(Screen.PlantCreation.route) },
                 modifier = Modifier.fillMaxWidth().padding(10.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.secondary
@@ -216,7 +219,7 @@ fun GardenScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel, tokenM
                 BushCard(berryBush = plant, modifier = Modifier.padding(horizontal = 6.dp, vertical = 8.dp))
             }
         }
-        item {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             if (state == ScreenState.Loading){
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
                     CircularProgressIndicator()
@@ -227,10 +230,14 @@ fun GardenScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel, tokenM
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ){
-                    Column() {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Icon(
                             painter = painterResource(R.drawable.sentiment_dissatisfied_24dp),
-                            contentDescription = ""
+                            contentDescription = "",
+                            modifier = Modifier.size(28.dp)
                         )
                         Text(
                             text = "У вас ще немає рослин. Додайте одну!",
