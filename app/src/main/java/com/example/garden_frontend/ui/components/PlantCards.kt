@@ -84,7 +84,7 @@ fun BushCard(modifier: Modifier = Modifier, berryBush: PlantModel) {
                 Text(
                     text = berryBush.status?.toString() ?: "Невідомий статус",
                     style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = if (berryBush.status?.toString() == "Хворий") MaterialTheme.colorScheme.scrim else if (berryBush.status?.toString() == "Мертвий") MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
