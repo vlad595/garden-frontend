@@ -19,8 +19,11 @@ data class Harvest(
     val plantId: Int,
     val weightKg: Double,
     val harvestDate: String,
-    val processingMethod: ProcessingMethods
+    val processingMethod: Int
 ) {
+
+    val methodEnum: ProcessingMethods
+        get() = ProcessingMethods.entries.find { it.value == processingMethod } ?: ProcessingMethods.FRESH
     fun getFormattedWeight(): String {
         return "%.2f кг".format(weightKg)
     }

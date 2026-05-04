@@ -10,7 +10,9 @@ import com.example.garden_frontend.data.api.dto.UserReturnResponse
 import com.example.garden_frontend.data.api.dto.UserLoginRequest
 import com.example.garden_frontend.data.api.dto.UserRegRequest
 import com.example.garden_frontend.domain.models.BerryBush
+import com.example.garden_frontend.domain.models.CareResource
 import com.example.garden_frontend.domain.models.FruitTree
+import com.example.garden_frontend.domain.models.Harvest
 import com.example.garden_frontend.domain.models.Plant
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -33,4 +35,10 @@ interface GardenApi {
 
     @POST("api/FruitTree")
     suspend fun postFruitTree(@Header("Authorization") token: String, @Body fruitTree: FruitTreeCreation): Response<FruitTree>
+
+    @GET("api/Harvests")
+    suspend fun getAllHarvests(@Header("Authorization") token: String) : Response<List<Harvest>>
+
+    @GET("api/CareResources")
+    suspend fun getAllCareResources(@Header("Authorization") token: String) : Response<List<CareResource>>
 }

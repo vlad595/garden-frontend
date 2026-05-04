@@ -250,12 +250,12 @@ fun PlantCreationScreen(modifier: Modifier = Modifier, navController: NavControl
                         when (currentForm) {
                             is CreationForm.BerryBushCreationForm -> {
                                 val newBush = BerryBushCreation(name, species, plantedAt + "T06:46:40.622Z", selectedStatus.ordinal, trellisNeeds)
-                                viewModel.PostBerryBush(token, newBush) { /* Успіх обробляється в LaunchedEffect */ }
+                                viewModel.PostBerryBush(token, newBush) {  }
                             }
                             is CreationForm.FruitTreeCreationForm -> {
                                 val parsedHeight = height.toIntOrNull() ?: 0
                                 val newTree = FruitTreeCreation(name, species, plantedAt + "T06:46:40.622Z", selectedStatus.ordinal, parsedHeight)
-                                viewModel.PostFruitTree(token, newTree) { /* Успіх обробляється в LaunchedEffect */ }
+                                viewModel.PostFruitTree(token, newTree) {  }
                             }
                         }
                     },

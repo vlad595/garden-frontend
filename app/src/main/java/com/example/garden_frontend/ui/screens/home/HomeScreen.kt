@@ -1,6 +1,9 @@
 package com.example.garden_frontend.ui.screens.home
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material3.Card
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.layout.Column
@@ -9,8 +12,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -19,12 +25,17 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -52,6 +63,7 @@ import com.example.garden_frontend.data.api.dto.PlantStatus
 import com.example.garden_frontend.domain.models.BerryBush
 import com.example.garden_frontend.domain.models.CareResource
 import com.example.garden_frontend.domain.models.Harvest
+import com.example.garden_frontend.domain.models.ProcessingMethods
 import com.example.garden_frontend.ui.components.BottomBar
 import com.example.garden_frontend.ui.components.BushCard
 import com.example.garden_frontend.ui.components.DashBoardCard
@@ -62,6 +74,7 @@ import com.example.garden_frontend.ui.theme.GardenfrontendTheme
 import com.example.garden_frontend.utils.TokenManager
 import kotlinx.coroutines.launch
 import com.example.garden_frontend.ui.components.DashboardData
+import com.example.garden_frontend.ui.components.HarvestItemCard
 
 @Composable
 fun Main(navController: NavHostController, tokenManager: TokenManager){
@@ -194,7 +207,7 @@ fun GardenScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel, tokenM
             bottom = innerPadding.calculateBottomPadding() + 16.dp
         )
     ) {
-        item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(this.maxLineSpan) }) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             Button(
                 onClick = { navController.navigate(Screen.PlantCreation.route) },
                 modifier = Modifier.fillMaxWidth().padding(10.dp),
@@ -250,18 +263,128 @@ fun GardenScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel, tokenM
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HarvestsScreen(viewModel: HomeViewModel, tokenManager: TokenManager, innerPadding: PaddingValues){
-    val state by viewModel.state.collectAsState()
+fun HarvestsScreen(viewModel: HomeViewModel, tokenManager: TokenManager, innerPadding: PaddingValues) {
     var harvests by remember { mutableStateOf<List<Harvest>?>(null) }
+    val state by viewModel.state.collectAsState()
 
-    LazyColumn(
+    LaunchedEffect(key1 = tokenManager.getToken()) {
+        val token = tokenManager.getToken()
+        if (token != null) {
+            viewModel.GetHarvests(token, onSuccess = { harvestsList -> harvests = harvestsList })
+        }
+    }
 
+    val groupedHarvests = remember(harvests) {
+        harvests?.groupBy { it.plantId }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(
+                top = innerPadding.calculateTopPadding(),
+                bottom = innerPadding.calculateBottomPadding()
+            )
     ) {
+        when {
+            state is ScreenState.Loading -> {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
 
+            state is ScreenState.Error -> {
+                Column(
+                    modifier = Modifier.align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        painter = painterResource(android.R.drawable.ic_dialog_alert),
+                        contentDescription = "Помилка",
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(48.dp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = (state as ScreenState.Error).ErrorMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+
+            groupedHarvests.isNullOrEmpty() -> {
+                Column(
+                    modifier = Modifier.align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.psychiatry_24px),
+                        contentDescription = null,
+                        modifier = Modifier.size(80.dp),
+                        tint = MaterialTheme.colorScheme.primaryContainer
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Врожаю ще немає",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Час збирати перші плоди!",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            else -> {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 80.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    groupedHarvests.forEach { (plantId, plantHarvests) ->
+
+                        stickyHeader {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                contentAlignment = Alignment.CenterStart
+                            ) {
+                                Surface(
+                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    shape = RoundedCornerShape(50)
+                                ) {
+                                    Text(
+                                        text = "Рослина #$plantId",
+                                        style = MaterialTheme.typography.labelLarge,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+                                    )
+                                }
+                            }
+                        }
+
+                        items(plantHarvests) { harvest ->
+                            HarvestItemCard(harvest)
+                        }
+
+                        item { Spacer(modifier = Modifier.height(8.dp)) }
+                    }
+                }
+            }
+        }
     }
 }
-
 @Composable
 fun CareResourcesScreen(viewModel: HomeViewModel, tokenManager: TokenManager, innerPadding: PaddingValues){
     val state by viewModel.state.collectAsState()
