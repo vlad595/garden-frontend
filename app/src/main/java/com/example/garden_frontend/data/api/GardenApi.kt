@@ -1,7 +1,9 @@
 package com.example.garden_frontend.data.api
 
 import com.example.garden_frontend.data.api.dto.BerryBushCreation
+import com.example.garden_frontend.data.api.dto.CareResourceDto
 import com.example.garden_frontend.data.api.dto.FruitTreeCreation
+import com.example.garden_frontend.data.api.dto.HarvestCreateRequest
 import com.example.garden_frontend.data.api.dto.PlantModel
 import retrofit2.Response
 import retrofit2.http.Body
@@ -16,6 +18,8 @@ import com.example.garden_frontend.domain.models.Harvest
 import com.example.garden_frontend.domain.models.Plant
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.PATCH
+import retrofit2.http.Path
 
 interface GardenApi {
     @POST("api/Auth/login")
@@ -40,5 +44,20 @@ interface GardenApi {
     suspend fun getAllHarvests(@Header("Authorization") token: String) : Response<List<Harvest>>
 
     @GET("api/CareResources")
-    suspend fun getAllCareResources(@Header("Authorization") token: String) : Response<List<CareResource>>
+    suspend fun getAllCareResources(@Header("Authorization") token: String) : Response<List<CareResourceDto>>
+
+    @GET("api/FruitTree/{id}")
+    suspend fun getFruitTreeById(@Path("id") id: Int, @Header("Authorization") token: String) : Response<FruitTree>
+
+    @GET("api/BerryBush/{id}")
+    suspend fun getBerryBush(@Path("id") id: Int, @Header("Authorization") token: String) : Response<BerryBush>
+
+    @POST("api/Harvests")
+    suspend fun postHarvest(@Header("Authorization") token: String, @Body harvest: HarvestCreateRequest) : Response<Harvest>
+
+    @GET("api/Harvests/{plantId}")
+    suspend fun getHarvestsByPlant(@Path("plantId") plantId: Int, @Header("Authorization") token: String) : Response<Harvest>
+
+    @PATCH("api/CareResources/{id}/quantity")
+    suspend fun updCareResourceQuantity(@Path("id") id: Int, @Header("Authorization") token: String, @Body quantity: Int): Response<CareResourceDto>
 }

@@ -5,4 +5,7 @@ sealed class Screen(val route: String) {
     object Home : Screen("home")
     object Account : Screen("account")
     object PlantCreation : Screen("plantCreation")
+    object PlantInf : Screen("plant_inf/{plantId}/{isTree}") {
+        fun createRoute(plantId: Int, isTree: Boolean) = "plant_inf/$plantId/$isTree"
+    }
 }

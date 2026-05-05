@@ -3,6 +3,7 @@ package com.example.garden_frontend.ui.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,7 +37,7 @@ import com.example.garden_frontend.domain.models.BerryBush
 import com.example.garden_frontend.ui.theme.GardenfrontendTheme
 
 @Composable
-fun BushCard(modifier: Modifier = Modifier, berryBush: PlantModel) {
+fun BushCard(modifier: Modifier = Modifier, berryBush: PlantModel, onClick: () -> Unit) {
     Card(
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -46,6 +47,7 @@ fun BushCard(modifier: Modifier = Modifier, berryBush: PlantModel) {
         modifier = modifier
             .width(150.dp)
             .height(210.dp)
+            .clickable(onClick = onClick)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Image(

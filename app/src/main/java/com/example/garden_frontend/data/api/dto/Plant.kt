@@ -7,7 +7,8 @@ data class PlantModel(
     val name: String,
     val species: String,
     val status: PlantStatus,
-    val type: String
+    val type: String,
+    val id: Int
 )
 
 data class BerryBushCreation(

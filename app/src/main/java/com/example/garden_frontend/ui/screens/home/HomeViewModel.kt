@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.garden_frontend.data.api.Client
 import com.example.garden_frontend.data.api.dto.BerryBushCreation
+import com.example.garden_frontend.data.api.dto.CareResourceDto
 import com.example.garden_frontend.data.api.dto.FruitTreeCreation
 import com.example.garden_frontend.data.api.dto.PlantModel
 import com.example.garden_frontend.domain.models.BerryBush
@@ -63,7 +64,7 @@ class HomeViewModel : ViewModel(){
         }
     }
 
-    fun GetCareResources(token: String, onSuccess: (List<CareResource>) -> Unit){
+    fun GetCareResources(token: String, onSuccess: (List<CareResourceDto>) -> Unit){
         _state.value = ScreenState.Loading
 
         viewModelScope.launch {

@@ -1,9 +1,7 @@
 package com.example.garden_frontend.ui.screens.home
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.material3.Card
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.layout.Column
@@ -16,7 +14,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -25,15 +22,12 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -51,30 +45,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.garden_frontend.R
 import com.example.garden_frontend.data.api.dto.PlantModel
 import com.example.garden_frontend.data.api.dto.PlantStatus
-import com.example.garden_frontend.domain.models.BerryBush
 import com.example.garden_frontend.domain.models.CareResource
 import com.example.garden_frontend.domain.models.Harvest
-import com.example.garden_frontend.domain.models.ProcessingMethods
 import com.example.garden_frontend.ui.components.BottomBar
 import com.example.garden_frontend.ui.components.BushCard
 import com.example.garden_frontend.ui.components.DashBoardCard
 import com.example.garden_frontend.ui.components.TopBar
 import com.example.garden_frontend.ui.navigation.Screen
-import com.example.garden_frontend.ui.screens.auth.AuthState
-import com.example.garden_frontend.ui.theme.GardenfrontendTheme
 import com.example.garden_frontend.utils.TokenManager
 import kotlinx.coroutines.launch
 import com.example.garden_frontend.ui.components.DashboardData
 import com.example.garden_frontend.ui.components.HarvestItemCard
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import com.example.garden_frontend.data.api.dto.CareResourceDto
+import com.example.garden_frontend.domain.models.Fertilizer
+import com.example.garden_frontend.domain.models.PestControl
+import com.example.garden_frontend.ui.components.CareResourceCard
 
 @Composable
 fun Main(navController: NavHostController, tokenManager: TokenManager){
@@ -101,7 +95,7 @@ fun Main(navController: NavHostController, tokenManager: TokenManager){
             modifier = Modifier.fillMaxSize()
         ) { page ->
             when (page){
-                0 -> HomeScreen(viewModel = viewModel, tokenManager = tokenManager, innerPadding = innerPadding)
+                0 -> HomeScreen(viewModel = viewModel, tokenManager = tokenManager, innerPadding = innerPadding, navController = navController)
                 1 -> GardenScreen(viewModel = viewModel, tokenManager = tokenManager, innerPadding = innerPadding, navController = navController)
                 2 -> HarvestsScreen(viewModel = viewModel, tokenManager = tokenManager, innerPadding = innerPadding)
                 3 -> CareResourcesScreen(viewModel = viewModel, tokenManager = tokenManager, innerPadding = innerPadding)
@@ -111,7 +105,7 @@ fun Main(navController: NavHostController, tokenManager: TokenManager){
 }
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel, tokenManager: TokenManager, innerPadding: PaddingValues){
+fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel, tokenManager: TokenManager, innerPadding: PaddingValues, navController: NavHostController){
     val state by viewModel.state.collectAsState()
     var lastPlants by remember { mutableStateOf<List<PlantModel>?>(null) }
 
@@ -156,7 +150,10 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel, tokenMan
                     items(lastPlants!!.takeLast(4).reversed()) { plants ->
                         BushCard(
                             berryBush = plants,
-                            modifier = Modifier.padding(start = 6.dp, end = 6.dp, bottom = 8.dp)
+                            modifier = Modifier.padding(start = 6.dp, end = 6.dp, bottom = 8.dp),
+                            onClick = {
+                                navController.navigate(Screen.PlantInf.createRoute(plants.id, if (plants.type == "Bush") false else true))
+                            }
                         )
                     }
                 }
@@ -229,7 +226,13 @@ fun GardenScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel, tokenM
 
         if (state == ScreenState.Success && Plants != null){
             items(Plants!!) { plant ->
-                BushCard(berryBush = plant, modifier = Modifier.padding(horizontal = 6.dp, vertical = 8.dp))
+                BushCard(
+                    berryBush = plant,
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 8.dp),
+                    onClick = {
+                        navController.navigate(Screen.PlantInf.createRoute(plant.id, if (plant.type == "Bush") false else true))
+                    }
+                )
             }
         }
         item(span = { GridItemSpan(maxLineSpan) }) {
@@ -360,14 +363,14 @@ fun HarvestsScreen(viewModel: HomeViewModel, tokenManager: TokenManager, innerPa
                                 contentAlignment = Alignment.CenterStart
                             ) {
                                 Surface(
-                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    color = MaterialTheme.colorScheme.secondary,
                                     shape = RoundedCornerShape(50)
                                 ) {
                                     Text(
                                         text = "Рослина #$plantId",
                                         style = MaterialTheme.typography.labelLarge,
                                         fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        color = MaterialTheme.colorScheme.background,
                                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
                                     )
                                 }
@@ -385,14 +388,106 @@ fun HarvestsScreen(viewModel: HomeViewModel, tokenManager: TokenManager, innerPa
         }
     }
 }
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CareResourcesScreen(viewModel: HomeViewModel, tokenManager: TokenManager, innerPadding: PaddingValues){
+fun CareResourcesScreen(viewModel: HomeViewModel, tokenManager: TokenManager, innerPadding: PaddingValues) {
     val state by viewModel.state.collectAsState()
-    var careRes by remember { mutableStateOf<List<CareResource>?>(null) }
+    var careRes by remember { mutableStateOf<List<CareResourceDto>?>(null) }
 
-    LazyColumn(
+    LaunchedEffect(key1 = tokenManager.getToken()) {
+        val token = tokenManager.getToken()
+        if (token != null) {
+            viewModel.GetCareResources(token, onSuccess = { resources -> careRes = resources })
+        }
+    }
 
+    val groupedResources = remember(careRes) {
+        careRes?.groupBy { resource ->
+            when (resource.resourceType) {
+                "Fertilizer" -> "Добрива"
+                "PestControl" -> "Засоби від шкідників"
+                else -> "Інше"
+            }
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(
+                top = innerPadding.calculateTopPadding(),
+                bottom = innerPadding.calculateBottomPadding()
+            )
     ) {
+        when {
+            state is ScreenState.Loading -> {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
 
+            state is ScreenState.Error -> {
+                Text(
+                    text = (state as ScreenState.Error).ErrorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+
+            groupedResources.isNullOrEmpty() -> {
+                Text(
+                    text = "У вас ще немає засобів догляду",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+
+            else -> {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 32.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    groupedResources.forEach { (categoryName, resources) ->
+
+                        stickyHeader {
+                            Surface(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                color = MaterialTheme.colorScheme.surface
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Spacer(
+                                        modifier = Modifier
+                                            .size(width = 4.dp, height = 24.dp)
+                                            .background(
+                                                color = MaterialTheme.colorScheme.primary,
+                                                shape = MaterialTheme.shapes.small
+                                            )
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = categoryName,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                    )
+                                }
+                            }
+                        }
+
+                        items(resources) { resource ->
+                            CareResourceCard(resource)
+                        }
+
+                        item { Spacer(modifier = Modifier.height(16.dp)) }
+                    }
+                }
+            }
+        }
     }
 }
