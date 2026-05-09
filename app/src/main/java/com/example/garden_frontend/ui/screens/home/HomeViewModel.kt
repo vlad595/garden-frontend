@@ -5,7 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.garden_frontend.data.api.Client
 import com.example.garden_frontend.data.api.dto.BerryBushCreation
 import com.example.garden_frontend.data.api.dto.CareResourceDto
+import com.example.garden_frontend.data.api.dto.FertilizerCreation
 import com.example.garden_frontend.data.api.dto.FruitTreeCreation
+import com.example.garden_frontend.data.api.dto.GardenStatisticsDto
+import com.example.garden_frontend.data.api.dto.PestControlCreation
 import com.example.garden_frontend.data.api.dto.PlantModel
 import com.example.garden_frontend.domain.models.BerryBush
 import com.example.garden_frontend.domain.models.CareResource
@@ -78,6 +81,82 @@ class HomeViewModel : ViewModel(){
                     _state.value = ScreenState.Error("Помилка відповіді: ${response.code()}")
                 }
             }catch(e: Exception){
+                _state.value = ScreenState.Error("Помилка з'єднання: ${e.localizedMessage}")
+            }
+        }
+    }
+
+    fun PostPestControl(token: String, pestControl: PestControlCreation, onSuccess: (CareResourceDto) -> Unit){
+        _state.value = ScreenState.Loading
+
+        viewModelScope.launch {
+            try{
+                val response = Client.api.postPestControl("Bearer $token", pestControl)
+
+                if (response.isSuccessful && response.body() != null){
+                    _state.value = ScreenState.Success
+                    onSuccess(response.body()!!)
+                } else {
+                    _state.value = ScreenState.Error("Помилка відповіді: ${response.code()}")
+                }
+            }catch (e: Exception){
+                _state.value = ScreenState.Error("Помилка з'єднання: ${e.localizedMessage}")
+            }
+        }
+    }
+
+    fun PostFertilizer(token: String, fertilizerCreation: FertilizerCreation, onSuccess: (CareResourceDto) -> Unit){
+        _state.value = ScreenState.Loading
+
+        viewModelScope.launch {
+            try{
+                val response = Client.api.postFertilizer("Bearer $token", fertilizerCreation)
+
+                if (response.isSuccessful && response.body() != null){
+                    _state.value = ScreenState.Success
+                    onSuccess(response.body()!!)
+                }else {
+                    _state.value = ScreenState.Error("Помилка відповіді: ${response.code()}")
+                }
+            } catch (e: Exception){
+                _state.value = ScreenState.Error("Помилка з'єднання: ${e.localizedMessage}")
+            }
+        }
+    }
+
+    fun DeleteCareResource(token: String, careResourceId: Int, onSuccess: () -> Unit){
+        _state.value = ScreenState.Loading
+
+        viewModelScope.launch {
+            try{
+                val response = Client.api.deleteCareResource(careResourceId, "Bearer $token")
+
+                if (response.isSuccessful){
+                    _state.value = ScreenState.Success
+                    onSuccess()
+                }else {
+                    _state.value = ScreenState.Error("Помилка відповіді: ${response.code()}")
+                }
+            } catch (e: Exception){
+                _state.value = ScreenState.Error("Помилка з'єднання: ${e.localizedMessage}")
+            }
+        }
+    }
+
+    fun GetStatistics(token: String, onSuccess: (GardenStatisticsDto) -> Unit){
+        _state.value = ScreenState.Loading
+
+        viewModelScope.launch {
+            try{
+                val response = Client.api.getStats("Bearer $token")
+
+                if (response.isSuccessful && response.body() != null){
+                    _state.value = ScreenState.Success
+                    onSuccess(response.body()!!)
+                } else {
+                    _state.value = ScreenState.Error("Помилка відповіді: ${response.code()}")
+                }
+            } catch (e: Exception){
                 _state.value = ScreenState.Error("Помилка з'єднання: ${e.localizedMessage}")
             }
         }

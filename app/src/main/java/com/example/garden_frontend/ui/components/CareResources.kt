@@ -2,6 +2,8 @@ package com.example.garden_frontend.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,9 +31,9 @@ import com.example.garden_frontend.domain.models.Fertilizer
 import com.example.garden_frontend.domain.models.PestControl
 
 @Composable
-fun CareResourceCard(resource: CareResourceDto) {
+fun CareResourceCard(resource: CareResourceDto, onLongClick: () -> Unit) {
     OutlinedCard(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().combinedClickable(onLongClick = onLongClick, onClick = {}),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.outlinedCardColors(
             containerColor = MaterialTheme.colorScheme.surface

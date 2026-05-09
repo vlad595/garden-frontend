@@ -55,20 +55,27 @@ import com.example.garden_frontend.domain.models.CareResource
 import com.example.garden_frontend.domain.models.Harvest
 import com.example.garden_frontend.ui.components.BottomBar
 import com.example.garden_frontend.ui.components.BushCard
-import com.example.garden_frontend.ui.components.DashBoardCard
 import com.example.garden_frontend.ui.components.TopBar
 import com.example.garden_frontend.ui.navigation.Screen
 import com.example.garden_frontend.utils.TokenManager
 import kotlinx.coroutines.launch
-import com.example.garden_frontend.ui.components.DashboardData
 import com.example.garden_frontend.ui.components.HarvestItemCard
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.text.input.KeyboardType
 import com.example.garden_frontend.data.api.dto.CareResourceDto
 import com.example.garden_frontend.domain.models.Fertilizer
 import com.example.garden_frontend.domain.models.PestControl
 import com.example.garden_frontend.ui.components.CareResourceCard
+import com.example.garden_frontend.data.api.dto.*
+import com.example.garden_frontend.ui.components.CareResourcesCard
+import com.example.garden_frontend.ui.components.CreateCareResourceDialog
+import com.example.garden_frontend.ui.components.DeleteCareResourceDialog
+import com.example.garden_frontend.ui.components.FinanceSummaryCard
+import com.example.garden_frontend.ui.components.GardenOverviewCard
+import com.example.garden_frontend.ui.components.HarvestStatisticsCard
 
 @Composable
 fun Main(navController: NavHostController, tokenManager: TokenManager){
@@ -108,10 +115,15 @@ fun Main(navController: NavHostController, tokenManager: TokenManager){
 fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel, tokenManager: TokenManager, innerPadding: PaddingValues, navController: NavHostController){
     val state by viewModel.state.collectAsState()
     var lastPlants by remember { mutableStateOf<List<PlantModel>?>(null) }
+    var stats by remember { mutableStateOf<GardenStatisticsDto?>(null) }
 
     LaunchedEffect(key1 = tokenManager.getToken()) {
         viewModel.GetPlants(tokenManager.getToken()!!, onSuccess = { plants ->
             lastPlants = plants
+        })
+
+        viewModel.GetStatistics(tokenManager.getToken()!!, onSuccess = { stat ->
+            stats = stat
         })
     }
 
@@ -126,10 +138,10 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel, tokenMan
         item {
             Text(
                 text = "Home",
-                fontSize = 22.sp,
+                fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = modifier.fillMaxWidth().padding(4.dp),
-                textAlign = TextAlign.Start
+                modifier = modifier.fillMaxWidth().padding(10.dp),
+                textAlign = TextAlign.Center
             )
         }
         item {
@@ -169,17 +181,11 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel, tokenMan
         }
 
         item {
-            if (state == ScreenState.Success && lastPlants != null) {
-                DashBoardCard(
-                    data = DashboardData(
-                        totalPlants = lastPlants!!.size,
-                        sickPlants = lastPlants!!.filter { it.status == PlantStatus.Хворий }.size,
-                        careProducts = 0,
-                        harvestHistory = listOf(0.2f, 0.4f, 0.3f, 0.7f, 0.9f, 1.0f),
-                        expenseHistory = listOf(0.8f, 0.5f, 0.2f, 0.4f, 0.3f, 0.1f)
-                    ),
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 14.dp)
-                )
+            if (state == ScreenState.Success && stats != null) {
+                GardenOverviewCard(stats!!)
+                HarvestStatisticsCard(stats!!)
+                CareResourcesCard(stats!!)
+                FinanceSummaryCard(stats!!)
             } else {
                 CircularProgressIndicator(modifier = Modifier.padding(16.dp))
             }
@@ -393,6 +399,9 @@ fun HarvestsScreen(viewModel: HomeViewModel, tokenManager: TokenManager, innerPa
 fun CareResourcesScreen(viewModel: HomeViewModel, tokenManager: TokenManager, innerPadding: PaddingValues) {
     val state by viewModel.state.collectAsState()
     var careRes by remember { mutableStateOf<List<CareResourceDto>?>(null) }
+    var showCreateDialog by remember { mutableStateOf(false) }
+    var resourceToDelete by remember { mutableStateOf<CareResourceDto?>(null) }
+
 
     LaunchedEffect(key1 = tokenManager.getToken()) {
         val token = tokenManager.getToken()
@@ -421,11 +430,11 @@ fun CareResourcesScreen(viewModel: HomeViewModel, tokenManager: TokenManager, in
             )
     ) {
         when {
-            state is ScreenState.Loading -> {
+            state is ScreenState.Loading && careRes == null -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
 
-            state is ScreenState.Error -> {
+            state is ScreenState.Error && careRes == null -> {
                 Text(
                     text = (state as ScreenState.Error).ErrorMessage,
                     color = MaterialTheme.colorScheme.error,
@@ -433,7 +442,7 @@ fun CareResourcesScreen(viewModel: HomeViewModel, tokenManager: TokenManager, in
                 )
             }
 
-            groupedResources.isNullOrEmpty() -> {
+            groupedResources.isNullOrEmpty() && state !is ScreenState.Loading -> {
                 Text(
                     text = "У вас ще немає засобів догляду",
                     style = MaterialTheme.typography.bodyLarge,
@@ -445,10 +454,10 @@ fun CareResourcesScreen(viewModel: HomeViewModel, tokenManager: TokenManager, in
             else -> {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 32.dp),
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 80.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    groupedResources.forEach { (categoryName, resources) ->
+                    groupedResources?.forEach { (categoryName, resources) ->
 
                         stickyHeader {
                             Surface(
@@ -458,7 +467,9 @@ fun CareResourcesScreen(viewModel: HomeViewModel, tokenManager: TokenManager, in
                                 color = MaterialTheme.colorScheme.surface
                             ) {
                                 Row(
-                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 4.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Spacer(
@@ -481,13 +492,78 @@ fun CareResourcesScreen(viewModel: HomeViewModel, tokenManager: TokenManager, in
                         }
 
                         items(resources) { resource ->
-                            CareResourceCard(resource)
+                            CareResourceCard(
+                                resource,
+                                onLongClick = {
+                                    resourceToDelete = resource
+                                }
+                            )
                         }
 
                         item { Spacer(modifier = Modifier.height(16.dp)) }
                     }
                 }
             }
+        }
+
+        FloatingActionButton(
+            onClick = { showCreateDialog = true },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary
+        ) {
+            Icon(painter = painterResource(R.drawable.add_24dp), contentDescription = "")
+        }
+
+        if (showCreateDialog) {
+            CreateCareResourceDialog(
+                onDismiss = { showCreateDialog = false },
+                onCreateFertilizer = { fertilizer ->
+                    val token = tokenManager.getToken()
+                    if (token != null) {
+                        viewModel.PostFertilizer(token, fertilizer) { newResource ->
+                            careRes = careRes.orEmpty() + newResource
+                            showCreateDialog = false
+                        }
+                    }
+                },
+                onCreatePestControl = { pestControl ->
+                    val token = tokenManager.getToken()
+                    if (token != null) {
+                        viewModel.PostPestControl(token, pestControl) { newResource ->
+                            careRes = careRes.orEmpty() + newResource
+                            showCreateDialog = false
+                        }
+                    }
+                }
+            )
+        }
+        resourceToDelete?.let { resource ->
+            DeleteCareResourceDialog(
+                type = when (resource.resourceType) {
+                    "Fertilizer" -> "добриво"
+                    "PestControl" -> "засіб від шкідників"
+                    else -> "засіб"
+                },
+                name = resource.name,
+                onDismiss = {
+                    resourceToDelete = null
+                },
+                onConfirm = {
+                    val token = tokenManager.getToken()
+                    if (token != null) {
+                        viewModel.DeleteCareResource(
+                            token = token,
+                            careResourceId = resource.id
+                        ) {
+                            careRes = careRes?.filter { it.id != resource.id }
+                            resourceToDelete = null
+                        }
+                    }
+                }
+            )
         }
     }
 }

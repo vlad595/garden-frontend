@@ -27,12 +27,7 @@ import com.example.garden_frontend.ui.components.AddHarvestDialog
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun PlantScreen(
-    navController: NavHostController,
-    tokenManager: TokenManager,
-    plantId: Int,
-    isTree: Boolean
-) {
+fun PlantScreen(navController: NavHostController, tokenManager: TokenManager, plantId: Int, isTree: Boolean) {
     val viewModel: PlantViewModel = viewModel()
     val screenState by viewModel.state.collectAsState()
     val token = tokenManager.getToken() ?: ""
@@ -42,7 +37,6 @@ fun PlantScreen(
 
     var showHarvestDialog by remember { mutableStateOf(false) }
     var showResourceDialog by remember { mutableStateOf(false) }
-
 
     LaunchedEffect(plantId) {
         if (isTree) {
@@ -67,11 +61,7 @@ fun PlantScreen(
         }
     ) { innerPadding ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp)
-        ) {
+            modifier = Modifier.fillMaxSize().padding(innerPadding).padding(16.dp)) {
             when (screenState) {
                 is ScreenState.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))

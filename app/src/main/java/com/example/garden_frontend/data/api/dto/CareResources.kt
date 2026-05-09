@@ -14,3 +14,19 @@ data class CareResourceDto(
     val targetPest: String,
     val waitingDays: Int
 )
+
+data class PestControlCreation(
+    val name: String,
+    val quantity: Int,
+    val price: Int,
+    val targetPest: String,
+    val waitingDays: Int
+)
+
+data class FertilizerCreation(
+    val name: String,
+    val quantity: Int,
+    val price: Int,
+    val isOrganic: Boolean,
+    val nutrients: String
+)

@@ -2,6 +2,7 @@ package com.example.garden_frontend.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,8 +26,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.garden_frontend.R
 import com.example.garden_frontend.domain.models.Harvest
+import com.example.garden_frontend.ui.navigation.Screen
 
 @Composable
 fun HarvestItemCard(harvest: Harvest) {
