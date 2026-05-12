@@ -114,7 +114,7 @@ fun AuthCardContent(viewModel: AuthViewModel, navController: NavHostController, 
     }
     else {
         Text(
-            text = "Вхід",
+            text = "Авторизація",
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
             fontWeight = FontWeight.Bold,

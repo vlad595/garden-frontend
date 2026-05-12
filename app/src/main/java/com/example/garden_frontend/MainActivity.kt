@@ -10,7 +10,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.garden_frontend.ui.navigation.NavSetup
 import com.example.garden_frontend.ui.navigation.Screen
 import com.example.garden_frontend.ui.theme.GardenfrontendTheme
-import com.example.garden_frontend.ui.screens.Main
 import com.example.garden_frontend.utils.TokenManager
 
 class MainActivity : ComponentActivity() {
