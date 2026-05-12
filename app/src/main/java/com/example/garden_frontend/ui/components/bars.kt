@@ -1,5 +1,6 @@
 package com.example.garden_frontend.ui.components
 
+import android.widget.Button
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -18,14 +20,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.garden_frontend.R
 
 @Composable
-fun TopBar(){
+fun TopBar(iconOnClick: () -> Unit, painter: Painter){
     Column(
         modifier = Modifier.fillMaxWidth().background(color = MaterialTheme.colorScheme.primary)
     ) {
@@ -52,10 +56,10 @@ fun TopBar(){
             Spacer(modifier = Modifier.weight(1f))
 
             IconButton(
-                onClick = {/*TODO*/}
+                onClick = iconOnClick
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.account_circle_40px),
+                    painter = painter,
                     contentDescription = "",
                     modifier = Modifier.size(48.dp),
                     tint = MaterialTheme.colorScheme.onPrimary
@@ -66,88 +70,44 @@ fun TopBar(){
 }
 
 @Composable
-fun BottomBar(){
+fun BottomBar(currentPage: Int, onTabSelected: (Int) -> Unit){
     Row(
         modifier = Modifier.fillMaxWidth()
             .padding(vertical = 10.dp, horizontal = 5.dp)
             .shadow(16.dp, RoundedCornerShape(64.dp))
             .background(MaterialTheme.colorScheme.secondary)
     ){
-        Button(
-            onClick = {/*TODO*/},
-            modifier = Modifier.weight(1f).padding(vertical = 6.dp, horizontal = 4.dp),
-            contentPadding = PaddingValues(horizontal = 0.dp, vertical = 12.dp)
+        BottomNavItem("Home", painterResource(R.drawable.home_24dp), { onTabSelected(0) }, modifier = Modifier.weight(0.25f), isSelected = currentPage == 0)
+        BottomNavItem("Garden", painterResource(R.drawable.potted_plant_24dp), { onTabSelected(1) }, modifier = Modifier.weight(0.25f), isSelected = currentPage == 1)
+        BottomNavItem("Harvests", painterResource(R.drawable.grocery_24dp), { onTabSelected(2) }, modifier = Modifier.weight(0.25f), isSelected = currentPage == 2)
+        BottomNavItem("Health", painterResource(R.drawable.health_cross_24dp), { onTabSelected(3) }, modifier = Modifier.weight(0.25f), isSelected = currentPage == 3)
+    }
+}
+
+@Composable
+fun BottomNavItem(name: String, icon: Painter, onClick: () -> Unit, modifier: Modifier = Modifier, isSelected: Boolean = false) {
+
+    Button(
+        onClick = onClick,
+        modifier = modifier.padding(vertical = 6.dp, horizontal = 4.dp),
+        contentPadding = PaddingValues(horizontal = 0.dp, vertical = 12.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
+        )
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.psychiatry_24px),
-                    contentDescription = "",
-                    modifier = Modifier.size(32.dp)
-                )
-                Text(
-                    text = "Home",
-                    maxLines = 1
-                )
-            }
-        }
-
-        Button(
-            onClick = {/*TODO*/},
-            modifier = Modifier.weight(1f).padding(vertical = 6.dp, horizontal = 4.dp),
-            contentPadding = PaddingValues(horizontal = 0.dp, vertical = 12.dp)
-        ){
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.psychiatry_24px),
-                    contentDescription = "",
-                    modifier = Modifier.size(32.dp)
-                )
-                Text(
-                    text = "Home"
-                )
-            }
-        }
-
-        Button(
-            onClick = {/*TODO*/},
-            modifier = Modifier.weight(1f).padding(vertical = 6.dp, horizontal = 4.dp),
-            contentPadding = PaddingValues(horizontal = 0.dp, vertical = 12.dp)
-        ){
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.psychiatry_24px),
-                    contentDescription = "",
-                    modifier = Modifier.size(32.dp)
-                )
-                Text(
-                    text = "Home"
-                )
-            }
-        }
-
-        Button(
-            onClick = {/*TODO*/},
-            modifier = Modifier.weight(1f).padding(vertical = 6.dp, horizontal = 4.dp),
-            contentPadding = PaddingValues(horizontal = 0.dp, vertical = 12.dp)
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.psychiatry_24px),
-                    contentDescription = "",
-                    modifier = Modifier.size(32.dp)
-                )
-                Text(
-                    text = "Home"
-                )
-            }
+            Icon(
+                painter = icon,
+                contentDescription = "",
+                modifier = Modifier.size(32.dp)
+            )
+            Text(
+                text = name,
+                fontSize = 12.sp,
+                maxLines = 1
+            )
         }
     }
 }
